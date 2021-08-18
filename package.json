@@ -1,6 +1,6 @@
 {
   "name": "@brandonocasey/spawn-promise",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A wrapper around spawn that returns a promise with the similar output to spawnSync.",
   "main": "src/index.js",
   "keywords": [
