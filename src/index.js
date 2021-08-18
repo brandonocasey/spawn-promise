@@ -17,6 +17,7 @@ const spawnPromise = function(bin, args, options) {
     const encoding = options && options.encoding || 'buffer';
 
     const result = {
+      parameters: [bin, args, options],
       pid: child.pid,
       output: [],
       stdin: null,

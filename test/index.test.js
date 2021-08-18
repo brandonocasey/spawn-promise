@@ -2,7 +2,11 @@ const test = require('ava');
 const spawnPromise = require('../src/index.js');
 
 test('general utf8', function(t) {
-  return spawnPromise('node', ['-e', 'console.log("foo");console.error("bar")'], {encoding: 'utf8'}).then(function(result) {
+  const bin = 'node';
+  const args = ['-e', 'console.log("foo");console.error("bar")'];
+  const options = {encoding: 'utf8'};
+
+  return spawnPromise(bin, args, options).then(function(result) {
     t.deepEqual(result.stdin, null, 'stdin');
     t.deepEqual(result.combined, 'foo\nbar\n', 'combined');
     t.deepEqual(result.stdout, 'foo\n', 'stdout');
@@ -14,11 +18,17 @@ test('general utf8', function(t) {
     t.truthy(result.pid, 'pid');
     t.is(result.status, 0, 'status');
     t.is(result.signal, null, 'signal');
+    t.deepEqual(result.parameters[0], bin, 'bin');
+    t.deepEqual(result.parameters[1], args, 'args');
+    t.deepEqual(result.parameters[2], options, 'options');
   });
 });
 
 test('general buffer', function(t) {
-  return spawnPromise('node', ['-e', 'console.log("foo");console.error("bar")']).then(function(result) {
+  const bin = 'node';
+  const args = ['-e', 'console.log("foo");console.error("bar")'];
+
+  return spawnPromise(bin, args).then(function(result) {
     t.deepEqual(result.stdin, null, 'stdin');
     t.deepEqual(result.combined, Buffer.from('foo\nbar\n'), 'combined');
     t.deepEqual(result.stdout, Buffer.from('foo\n'), 'stdout');
@@ -30,11 +40,17 @@ test('general buffer', function(t) {
     t.truthy(result.pid, 'pid');
     t.is(result.status, 0, 'status');
     t.is(result.signal, null, 'signal');
+    t.deepEqual(result.parameters[0], bin, 'bin');
+    t.deepEqual(result.parameters[1], args, 'args');
+    t.falsy(result.parameters[2], 'options');
   });
 });
 
 test('error', function(t) {
-  return spawnPromise('this-does-not-exist-please', []).then(function(result) {
+  const bin = 'this-does-not-exist-please';
+  const args = [];
+
+  return spawnPromise(bin, args).then(function(result) {
     t.deepEqual(result.stdin, null, 'stdin');
     t.deepEqual(result.combined, Buffer.from(''), 'combined');
     t.deepEqual(result.stdout, Buffer.from(''), 'stdout');
@@ -46,5 +62,8 @@ test('error', function(t) {
     t.falsy(result.pid, 'pid');
     t.not(result.status, 0, 'status');
     t.is(result.signal, null, 'signal');
+    t.deepEqual(result.parameters[0], bin, 'bin');
+    t.deepEqual(result.parameters[1], args, 'args');
+    t.falsy(result.parameters[2], 'options');
   });
 });
