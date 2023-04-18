@@ -29,23 +29,29 @@ const spawnPromise = function(bin, args, options) {
       signal: null
     };
 
-    child.stdout.on('data', function(chunk) {
-      result.stdout = concatChunks(result.stdout, chunk);
-      result.combined = concatChunks(result.combined, chunk);
-    });
+    if (child.stdout) {
+      child.stdout.on('data', function(chunk) {
+        result.stdout = concatChunks(result.stdout, chunk);
+        result.combined = concatChunks(result.combined, chunk);
+      });
+    }
 
-    child.stderr.on('data', function(chunk) {
-      result.stderr = concatChunks(result.stderr, chunk);
-      result.combined = concatChunks(result.combined, chunk);
-    });
+    if (child.stderr) {
+      child.stderr.on('data', function(chunk) {
+        result.stderr = concatChunks(result.stderr, chunk);
+        result.combined = concatChunks(result.combined, chunk);
+      });
+    }
 
-    child.stdin.on('data', function(chunk) {
-      if (result.stdin === null) {
-        result.stdin = getDefault(encoding);
-      }
+    if (child.stdin) {
+      child.stdin.on('data', function(chunk) {
+        if (result.stdin === null) {
+          result.stdin = getDefault(encoding);
+        }
 
-      result.stdin = concatChunks(result.stdin, chunk);
-    });
+        result.stdin = concatChunks(result.stdin, chunk);
+      });
+    }
 
     child.on('error', function(error) {
       result.error = error;
